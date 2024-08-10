@@ -1,18 +1,20 @@
 import OpenAI from "openai";
-import {getWeather} from './prep/weather.js'
+// import {getWeather} from './prep/weather.js'
 const openai = new OpenAI({apiKey: process.env.OPEN_AI_KEY});
 
 const weatherFunctionSpec = {
     name: "get_weather",
     description: "Get the current weather in a location.",
-    parameters: [
-        {
-            name: "location",
-            description: "The location to get the weather for.",
-            required: true,
-            type: "string",
+    parameters: {
+        type: "object",
+        properties: {
+            location: {
+                type: "string",
+                description: "The location to get the weather for."
+            },
         },
-    ],
+        required: ["location"]
+    },
     return_type: "string",
 }
 
