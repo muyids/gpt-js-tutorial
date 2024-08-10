@@ -17,18 +17,21 @@ const weatherFunctionSpec = {
     },
     return_type: "string",
 }
-
+let messages = [
+    { role: "system", content: "You give very short answers." },
+    { role: "user", content: "Is it raining in Beijing?" }
+]
+console.log('--- First messages ---');
+console.log(messages);
 const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
-    messages: [
-        { role: "system", content: "You give very short answers." },
-        { role: "user", content: "Is it raining in Beijing?" }
-    ],
+    messages: messages,
     functions: [weatherFunctionSpec]
 })
 
 // console.log(response.choices[0].message);
 let responseMessage = response.choices[0].message;
+messages.push(responseMessage);
 // responseMessage: 
 // {
 //     role: 'assistant',
@@ -41,4 +44,7 @@ if (responseMessage.function_call?.name === "get_weather") {
     console.log(`Gpt asked for the weather in ${location}.`);
     const weatherData = await getWeather(location);
     console.log(`weatherData: ${weatherData}`);
+    
+    messages.push({ role: "function", name: "get_weather", content: JSON.stringify(weatherData) });
+
 }
