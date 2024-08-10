@@ -27,4 +27,18 @@ const response = await openai.chat.completions.create({
     functions: [weatherFunctionSpec]
 })
 
-console.log(response.choices[0].message.content);
+// console.log(response.choices[0].message);
+let responseMessage = response.choices[0].message;
+// responseMessage: 
+// {
+//     role: 'assistant',
+//     content: null,
+//     function_call: { name: 'get_weather', arguments: '{"location":"Beijing"}' },
+//     refusal: null
+// }
+if (responseMessage.function_call?.name === "get_weather") {
+    const location = JSON.parse(responseMessage.function_call.arguments).location;
+    console.log(`Gpt asked for the weather in ${location}.`);
+    const weatherData = await getWeather(location);
+    console.log(weatherData);
+}
