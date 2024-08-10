@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import {getWeather} from './prep/weather.js'
+import {search_ticket, order_ticket} from './prep/ticket.js'
 const openai = new OpenAI({apiKey: process.env.OPEN_AI_KEY});
 
 const weatherFunctionSpec = {
@@ -18,9 +19,33 @@ const weatherFunctionSpec = {
     return_type: "string",
 }
 
-const ticketFunctionSpec = {
-    name: "ticket",
-    description: "Get ticket information for a flight.",
+const searchTicketFunctionSpec = {
+    name: "search_ticket",
+    description: "Search for a flight.",
+    parameters: {
+        type: "object",
+        properties: {
+            from: {
+                type: "string",
+                description: "The departure location."
+            },
+            to: {
+                type: "string",
+                description: "The destination location."
+            },
+            date: {
+                type: "string",
+                description: "The date of the flight."
+            },
+        },
+        required: ["from", "to", "date"]
+    },
+    return_type: "string",
+}
+
+const orderTicketFunctionSpec = {
+    name: "order_ticket",
+    description: "Order a flight ticket.",
     parameters: {
         type: "object",
         properties: {
@@ -45,14 +70,14 @@ const ticketFunctionSpec = {
 let messages = [
     { role: "system", content: "You give very short answers." },
     // { role: "user", content: "Is it raining in Beijing?" }
-    { role: "user", content: "Please book a flight for me from Beijing to Shanghai." }
+    { role: "user", content: "Please book a flight for me from Beijing to Shanghai tomorrow." }
 ]
 console.log('------------------- First Request -------------------');
 console.log(messages);
 const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: messages,
-    functions: [weatherFunctionSpec, ticketFunctionSpec]
+    functions: [weatherFunctionSpec, searchTicketFunctionSpec, orderTicketFunctionSpec]
 })
 
 console.log('------------------- First Response -------------------');
@@ -91,7 +116,24 @@ if (responseMessage.function_call?.name === "get_weather") {
 }
 
 
-if (responseMessage.function_call?.name === "ticket") {
+if (responseMessage.function_call?.name === "search_ticket") {
+    const {from, to, date} = JSON.parse(responseMessage.function_call.arguments);
+    console.log(`Gpt asked for the ticket from ${from} to ${to} on ${date}.`);
+    const ticketData = await search_ticket(from, to, date);
+    
+    messages.push({ role: "function", name: "ticket", content: JSON.stringify(ticketData) });
+    console.log('------------------- Third Request -------------------');
+    console.log(messages);
+    const response3 = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: messages,
+        functions: [ searchTicketFunctionSpec ]
+    })
+    console.log('------------------- Third Response -------------------');
+    console.log(response3.choices[0].message);
+}
+
+if (responseMessage.function_call?.name === "order_ticket") {
     const {from, to, date} = JSON.parse(responseMessage.function_call.arguments);
     console.log(`Gpt asked for the ticket from ${from} to ${to} on ${date}.`);
     const ticketData = await order_ticket(from, to, date);
@@ -102,7 +144,7 @@ if (responseMessage.function_call?.name === "ticket") {
     const response3 = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: messages,
-        functions: [ticketFunctionSpec]
+        functions: [ orderTicketFunctionSpec]
     })
     console.log('------------------- Third Response -------------------');
     console.log(response3.choices[0].message);
