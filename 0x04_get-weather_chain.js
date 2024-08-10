@@ -21,7 +21,7 @@ let messages = [
     { role: "system", content: "You give very short answers." },
     { role: "user", content: "Is it raining in Beijing?" }
 ]
-console.log('--- First messages ---');
+console.log('------------------- First Request -------------------');
 console.log(messages);
 const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -46,5 +46,14 @@ if (responseMessage.function_call?.name === "get_weather") {
     console.log(`weatherData: ${weatherData}`);
     
     messages.push({ role: "function", name: "get_weather", content: JSON.stringify(weatherData) });
-
+    console.log('------------------- Second Request -------------------');
+    console.log(messages);
+    const response2 = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: messages,
+        functions: [weatherFunctionSpec]
+    })
+    console.log('------------------- Second Response -------------------');
+    console.log(response2.choices[0].message);
+    
 }
