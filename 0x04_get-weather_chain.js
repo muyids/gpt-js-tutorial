@@ -19,7 +19,8 @@ const weatherFunctionSpec = {
 }
 let messages = [
     { role: "system", content: "You give very short answers." },
-    { role: "user", content: "Is it raining in Beijing?" }
+    // { role: "user", content: "Is it raining in Beijing?" }
+    { role: "user", content: "Will flights in Beijing be delayed today due to the weather?" }
 ]
 console.log('------------------- First Request -------------------');
 console.log(messages);
@@ -55,5 +56,5 @@ if (responseMessage.function_call?.name === "get_weather") {
     })
     console.log('------------------- Second Response -------------------');
     console.log(response2.choices[0].message);
-    
+
 }
