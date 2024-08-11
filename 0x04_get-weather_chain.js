@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import {getWeather} from './prep/weather.js'
 const openai = new OpenAI({apiKey: process.env.OPEN_AI_KEY});
 
+// ![](https://muyids.oss-cn-beijing.aliyuncs.com/img/Snipaste_2024-08-11_07-48-08.png)
+
 const weatherFunctionSpec = {
     name: "get_weather",
     description: "Get the current weather in a location.",
