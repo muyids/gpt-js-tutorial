@@ -9,6 +9,6 @@ const response = await openai.images.generate({
   size: "1024x1024",
 });
 
-image_url = response.data[0].url;
+let image_url = response.data[0].url;
 
 console.log(image_url);

@@ -86,9 +86,10 @@ async function callGpt(model, systemPrompt, userPrompt) {
 }
 
 // Example usage:
+const finalMessage = await callGpt("gpt-4o-mini", "You give very short answers.", "what is the weather in Beijing now?");
 // const finalMessage = await callGpt("gpt-4o-mini", "You give very short answers.", "Is the weather hotter in Beijing than Shanghai?");
 // const finalMessage = await callGpt("gpt-4o-mini", "You give very short answers.", "Give me the weather in the 3 largest cities in China.");
-const finalMessage = await callGpt("gpt-4o", 
-    "You are a very good assistant. I need your help to save a file.",
-    "Make a file call song.txt with the lyrics of the weather in Beijing today.");
+// const finalMessage = await callGpt("gpt-4o", 
+//     "You are a very good assistant. I need your help to save a file.",
+//     "Make a file call song.txt with the lyrics of the weather in Beijing today.");
 console.log('Final Message:', finalMessage);
